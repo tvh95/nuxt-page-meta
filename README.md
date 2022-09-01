@@ -12,6 +12,7 @@ init json config files
 `yarn page-meta:init`  
   
 ## nuxt.config
+example: [repository](https://github.com/tvh95/nuxt-page-meta/blob/main/playground/nuxt.config.ts)
 ```
 modules: [
   'nuxt-page-meta'
