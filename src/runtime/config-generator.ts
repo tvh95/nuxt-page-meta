@@ -63,15 +63,13 @@ function recursiveGetFiles (dir: string) {
         return { path: cleanPath }
       })
 
-    const metaJsonNewData = pagesList.map(data => ({ meta: {}, ...data }))
+    const metaJsonNewData = pagesList.map(data => ({ ...data, meta: {} }))
     if (existsSync(metaJson)) {
       const metaJsonOldData = JSON.parse(readFileSync(metaJson, 'utf-8'))
       lodash.merge(metaJsonNewData, metaJsonOldData)
     }
     mkdirSync(dirname(metaJson), { recursive: true })
-    const cleanedMetaJson = metaJsonNewData
-      .filter(({ meta }) => Object.keys(meta).length > 0)
-    writeFileSync(metaJson, JSON.stringify(cleanedMetaJson, undefined, 2))
+    writeFileSync(metaJson, JSON.stringify(metaJsonNewData, undefined, 2))
 
     const rootDirRegExp = new RegExp('^' + rootDir.replace(/\//, '\\/'))
     const imageList = imageDirs
@@ -81,7 +79,7 @@ function recursiveGetFiles (dir: string) {
       }, [])
     const imgJsonNewData = {
       disabled: [],
-      images: pagesList.map(data => ({ images: [], ...data })),
+      images: pagesList.map(data => ({ ...data, images: [] })),
       unused: imageList
     }
     if (existsSync(imgJson)) {
@@ -90,9 +88,6 @@ function recursiveGetFiles (dir: string) {
       const usedImage = imgJsonNewData.images.reduce((acc, { images }) => [...acc, ...images], [])
       imgJsonNewData.unused = imgJsonNewData.unused.filter(imagePath => !usedImage.includes(imagePath) && !imgJsonNewData.disabled.includes(imagePath))
     }
-    const cleanedImageJson = imgJsonNewData
-    cleanedImageJson.images = cleanedImageJson.images
-      .filter(({ images }) => images.length > 0)
     mkdirSync(dirname(imgJson), { recursive: true })
     writeFileSync(imgJson, JSON.stringify(imgJsonNewData, undefined, 2))
   } catch (error) {
