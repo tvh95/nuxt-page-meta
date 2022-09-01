@@ -1,6 +1,6 @@
 {
   "name": "nuxt-page-meta",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -34,6 +34,6 @@
     "nuxt": "^3.0.0-rc.6"
   },
   "bin": {
-    "page-meta-init": "node ./dist/runtime/config-generator.mjs"
+    "page-meta-init": "./dist/runtime/config-generator.mjs"
   }
 }
