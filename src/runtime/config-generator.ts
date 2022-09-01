@@ -7,13 +7,12 @@ import {
   readFileSync,
   mkdirSync,
   writeFileSync,
-  readdirSync,
-  existsSync,
-  lstatSync
+  existsSync
 } from 'fs'
 import consola from 'consola'
 import { loadConfig } from 'c12'
 import lodash from 'lodash'
+import { recursiveGetFiles } from '../tools'
 
 const relativeDir = process.argv[2] || ''
 const rootDir = resolve(process.cwd(), relativeDir)
@@ -31,27 +30,15 @@ async function nuxtConfig () {
   return config.pageMeta || {}
 }
 
-function recursiveGetFiles (dir: string) {
-  return readdirSync(dir)
-    .reduce((acc, path) => {
-      const newPath = resolve(dir, path)
-      if (lstatSync(newPath).isDirectory()) {
-        acc.push(...recursiveGetFiles(newPath))
-      } else {
-        acc.push(newPath)
-      }
-      return acc
-    }, [])
-}
-
 ;(async () => {
-  consola.log('Reading config from')
+  consola.log('Reading config')
   try {
     const config = await nuxtConfig()
     const metaJson = resolve(rootDir, config.page?.metaJson || 'static-data/page-meta.json')
     const imgJson = resolve(rootDir, config.sitemap?.imgJson || 'static-data/sitemap-image.json')
     const imageDirs = (config.sitemap?.imageDirs || ['assets/images']).map(path => resolve(rootDir, path))
 
+    consola.log('Generating data')
     const pagesDir = resolve(rootDir, './pages')
     const pagesDirRegExp = new RegExp('^' + pagesDir.replace(/\//, '\\/'))
     const pagesList = recursiveGetFiles(pagesDir)
@@ -63,7 +50,10 @@ function recursiveGetFiles (dir: string) {
         return { path: cleanPath }
       })
 
-    const metaJsonNewData = pagesList.map(data => ({ ...data, meta: {} }))
+    const sitemapExclude = config.sitemap?.exclude || []
+    const metaJsonNewData = pagesList
+      .filter(({ path }) => !sitemapExclude.includes(path))
+      .map(data => ({ ...data, meta: {} }))
     if (existsSync(metaJson)) {
       const metaJsonOldData = JSON.parse(readFileSync(metaJson, 'utf-8'))
       lodash.merge(metaJsonNewData, metaJsonOldData)
@@ -85,11 +75,15 @@ function recursiveGetFiles (dir: string) {
     if (existsSync(imgJson)) {
       const imgJsonOldData = JSON.parse(readFileSync(imgJson, 'utf-8'))
       lodash.merge(imgJsonNewData, imgJsonOldData)
-      const usedImage = imgJsonNewData.images.reduce((acc, { images }) => [...acc, ...images], [])
-      imgJsonNewData.unused = imgJsonNewData.unused.filter(imagePath => !usedImage.includes(imagePath) && !imgJsonNewData.disabled.includes(imagePath))
+      const usedImage = imgJsonNewData.images
+        .reduce((acc, { images }) => [...acc, ...images.map(path => new RegExp(path))], [])
+      const disabled = imgJsonNewData.disabled.map(path => new RegExp(path))
+      imgJsonNewData.unused = imgJsonNewData.unused
+        .filter(imagePath => !usedImage.find(regexp => regexp.test(imagePath)) && !disabled.find(regexp => regexp.test(imagePath)))
     }
     mkdirSync(dirname(imgJson), { recursive: true })
     writeFileSync(imgJson, JSON.stringify(imgJsonNewData, undefined, 2))
+    consola.log('Finish')
   } catch (error) {
     consola.error(error.message)
   }

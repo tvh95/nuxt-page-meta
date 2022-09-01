@@ -12,18 +12,24 @@ async function generateSitemap (
   exclude: Array<string> = [],
   imgMeta: Array<Sitemap.ImageMeta> = [],
   disabledImg: Array<string> = [],
+  imageFiles: Array<string> = [],
   imageDomain?: (url: string) => string | string,
   dynamicPaths?: () => Promise<Array<Sitemap.Meta>>
 ) {
   const staticPages = nuxtPages.filter((nuxtPage: NuxtPage) => !/\/(:|_)/i.test(nuxtPage.path))
   const dynamicPages = dynamicPaths ? await dynamicPaths() : [] as Array<Sitemap.Meta>
 
+  const disabledImgRegExp = disabledImg.map(path => new RegExp(path))
+  const enabledImages = imageFiles.filter(src => !disabledImgRegExp.find(regexp => regexp.test(src)))
+    .sort((a, b) => a > b ? 1 : -1)
+
   const combined = ([...staticPages, ...dynamicPages] as Array<Sitemap.Meta>)
     .map((page) => {
       const images = page.images || []
       for (const i in imgMeta) {
         if (imgMeta[i]?.path !== page.path && !imgMeta[i].match?.test(page.path)) { continue }
-        images.push(...imgMeta[i].images.filter(src => !disabledImg.includes(src)))
+        const imgRegExp = imgMeta[i].images.map(src => new RegExp(src))
+        images.push(...enabledImages.filter(src => imgRegExp.find(regexp => regexp.test(src))))
       }
       const url = (domain + page.path.replace(/\/{1,}/g, '/'))
       return { url, images, lastMod, path: page.path }

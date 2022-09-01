@@ -38,7 +38,7 @@ export default defineNuxtConfig({
         '/items/1'
       ],
       imageDomain: src => (/^\/assets\/?/.test(src) ? 'www.localhost.com' : 'cdn.localhost.com') + src,
-      imageDirs: ['assets/images', 'statics/images']
+      imageDirs: ['assets/images']
     }
   }
 })
