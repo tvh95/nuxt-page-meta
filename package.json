@@ -1,0 +1,39 @@
+{
+  "name": "nuxt-page-meta",
+  "version": "0.0.1",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/module.mjs",
+      "require": "./dist/module.cjs"
+    }
+  },
+  "main": "./dist/module.cjs",
+  "types": "./dist/types.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepack": "nuxt-module-build",
+    "dev": "nuxi dev playground",
+    "dev:build": "nuxi build playground",
+    "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground",
+    "create:json": "node ./dist/runtime/config-generator.mjs"
+  },
+  "dependencies": {
+    "@nuxt/kit": "^3.0.0-rc.6",
+    "dayjs": "^1.11.5",
+    "lodash": "^4.17.21",
+    "pug": "^3.0.2"
+  },
+  "devDependencies": {
+    "@nuxt/module-builder": "latest",
+    "@nuxtjs/eslint-config-typescript": "latest",
+    "eslint": "latest",
+    "nuxt": "^3.0.0-rc.6"
+  },
+  "bin": {
+    "page-meta:init": "node ./dist/runtime/config-generator.mjs"
+  }
+}

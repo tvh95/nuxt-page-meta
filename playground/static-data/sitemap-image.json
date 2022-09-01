@@ -1,0 +1,20 @@
+{
+  "disabled": [
+    "/assets/images/nuxt-2-disabled.png"
+  ],
+  "images": [
+    {
+      "images": [
+        "/menu/image.png",
+        "/assets/images/nuxt-2.png"
+      ],
+      "path": "/menu"
+    }
+  ],
+  "unused": [
+    "/assets/images/nuxt.png",
+    "/statics/images/static-nuxt.png",
+    "/assets/images/nuxt.png",
+    "/statics/images/static-nuxt.png"
+  ]
+}
