@@ -14,10 +14,10 @@ function generateRobotTxt (acl: Array<Robots.Meta> = [], domain: Array<string> =
     if (disallow?.length > 0) { str += '\n' + disallow.map(s => `Disallow: ${s}`).join('\n') }
     if (crawlDelay) { str += `\nCrawl-delay: ${crawlDelay}` }
     return str
-  }).join('\n\n')
+  })
 
   const sitemaps = domain.map(s => `Sitemap: ${s}/sitemap.xml`).join('\n')
-  return [strArray, sitemaps].join('\n\n')
+  return [...strArray, sitemaps].join('\n\n')
 }
 
 function writeFile (dir: string, data: string) {

@@ -1,8 +1,16 @@
 [
   {
+    "path": "/menu",
     "meta": {
       "keywords": "abcd"
-    },
-    "path": "/menu"
+    }
+  },
+  {
+    "match": "^\\/item\\/[^/]*\\/?$",
+    "meta": {}
+  },
+  {
+    "path": "/menu",
+    "meta": {}
   }
 ]

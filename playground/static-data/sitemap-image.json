@@ -4,11 +4,19 @@
   ],
   "images": [
     {
+      "path": "/menu",
       "images": [
         "/menu/image.png",
         "/assets/images/nuxt-2.png"
-      ],
-      "path": "/menu"
+      ]
+    },
+    {
+      "match": "^\\/item\\/[^/]*\\/?$",
+      "images": []
+    },
+    {
+      "path": "/menu",
+      "images": []
     }
   ],
   "unused": [

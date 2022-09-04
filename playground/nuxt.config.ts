@@ -35,6 +35,7 @@ export default defineNuxtConfig({
         ]
       },
       exclude: [
+        '/menu',
         '/items/1'
       ],
       imageDomain: src => (/^\/assets\/?/.test(src) ? 'www.localhost.com' : 'cdn.localhost.com') + src,

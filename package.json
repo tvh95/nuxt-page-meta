@@ -1,6 +1,6 @@
 {
   "name": "nuxt-page-meta",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -19,7 +19,7 @@
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground",
-    "create:json": "node ./dist/runtime/config-generator.mjs"
+    "page-meta-init": "yarn prepack && node ./dist/runtime/config-generator.mjs"
   },
   "dependencies": {
     "@nuxt/kit": "^3.0.0-rc.6",

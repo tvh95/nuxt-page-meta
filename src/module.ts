@@ -13,7 +13,7 @@ import {
   generateSitemap,
   writeFile as sitemapWriteFile
 } from './sitemap'
-import { recursiveGetFiles } from './tools'
+import { recursiveGetFiles } from './runtime/tools'
 
 const meta = { name: 'nuxt-page-meta', configKey: 'pageMeta' }
 
@@ -40,6 +40,11 @@ function setup (options: PageMeta.Configuration, nuxt) {
   const rootDirResolver = createResolver(nuxt.options.rootDir)
   const rootRegExp = new RegExp('^' + nuxt.options.rootDir)
 
+  let nuxtPages = []
+  nuxt.hook('pages:extend', (_nuxtPages: Array<NuxtPage>) => {
+    nuxtPages = _nuxtPages
+  })
+
   if (options.robots.enable) {
     nuxt.options.app?.head?.meta?.push({ name: 'robots', content: 'noindex' })
     nuxt.hook('close', () => {
@@ -52,16 +57,14 @@ function setup (options: PageMeta.Configuration, nuxt) {
 
   if (options.page.enable) {
     const metaJson = options.page.metaJson ? tryResolveModule(rootDirResolver.resolve(options.page.metaJson)) : null
-    global.metaData = metaJson ? require(metaJson) : {}
+    const metaData = metaJson ? require(metaJson) : []
+    global.metaData = metaData
     const runtimeDir = createResolver(import.meta.url).resolve('./runtime')
     nuxt.options.build.transpile.push(runtimeDir)
     addPlugin(createResolver(runtimeDir).resolve('page-meta'))
   }
 
   if (options.sitemap.enable) {
-    nuxt.hook('pages:extend', (_nuxtPages: Array<NuxtPage>) => { nuxtPages = _nuxtPages })
-
-    let nuxtPages
     const imgJson = options.sitemap.imgJson ? tryResolveModule(rootDirResolver.resolve(options.sitemap.imgJson)) : null
     const imgData: Sitemap.ImageConfiguration = imgJson ? require(imgJson) : {}
     const imageDirs = (options.sitemap.imageDirs || ['assets/images', 'statics/images'])

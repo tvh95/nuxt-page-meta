@@ -27,7 +27,10 @@ async function generateSitemap (
     .map((page) => {
       const images = page.images || []
       for (const i in imgMeta) {
-        if (imgMeta[i]?.path !== page.path && !imgMeta[i].match?.test(page.path)) { continue }
+        if (
+          imgMeta[i]?.path !== page.path &&
+          (!imgMeta[i].match || !(new RegExp(imgMeta[i].match)).test(page.path))
+        ) { continue }
         const imgRegExp = imgMeta[i].images.map(src => new RegExp(src))
         images.push(...enabledImages.filter(src => imgRegExp.find(regexp => regexp.test(src))))
       }

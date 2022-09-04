@@ -12,7 +12,7 @@ import {
 import consola from 'consola'
 import { loadConfig } from 'c12'
 import lodash from 'lodash'
-import { recursiveGetFiles } from '../tools'
+import { recursiveGetFiles } from './tools'
 
 const relativeDir = process.argv[2] || ''
 const rootDir = resolve(process.cwd(), relativeDir)
@@ -43,16 +43,14 @@ async function nuxtConfig () {
     const pagesDirRegExp = new RegExp('^' + pagesDir.replace(/\//, '\\/'))
     const pagesList = recursiveGetFiles(pagesDir)
       .map((path) => {
-        const cleanPath = path.replace(pagesDirRegExp, '').replace(/\.vue$/, '')
+        const cleanPath = path.replace(pagesDirRegExp, '').replace(/(index)?\.vue$/, '')
         if (/\/(_|:)/.test(cleanPath)) {
           return { match: '^' + cleanPath.replace(/\/_[^/]*/, '\\/[^/]*').replace(/\//, '\\/') + '\\/?$' }
         }
         return { path: cleanPath }
       })
 
-    const sitemapExclude = config.sitemap?.exclude || []
     const metaJsonNewData = pagesList
-      .filter(({ path }) => !sitemapExclude.includes(path))
       .map(data => ({ ...data, meta: {} }))
     if (existsSync(metaJson)) {
       const metaJsonOldData = JSON.parse(readFileSync(metaJson, 'utf-8'))
@@ -62,6 +60,7 @@ async function nuxtConfig () {
     writeFileSync(metaJson, JSON.stringify(metaJsonNewData, undefined, 2))
 
     const rootDirRegExp = new RegExp('^' + rootDir.replace(/\//, '\\/'))
+    const sitemapExclude = config.sitemap?.exclude || []
     const imageList = imageDirs
       .filter(imageDir => existsSync(imageDir))
       .reduce((acc, imageDir) => {
@@ -69,7 +68,9 @@ async function nuxtConfig () {
       }, [])
     const imgJsonNewData = {
       disabled: [],
-      images: pagesList.map(data => ({ ...data, images: [] })),
+      images: pagesList
+        .filter(({ path }) => !sitemapExclude.includes(path))
+        .map(data => ({ ...data, images: [] })),
       unused: imageList
     }
     if (existsSync(imgJson)) {
