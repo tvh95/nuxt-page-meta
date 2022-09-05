@@ -2,7 +2,8 @@
   {
     "path": "/menu",
     "meta": {
-      "keywords": "abcd"
+      "keywords": "abcd",
+      "og:image": "{{DOMAIN}}/image/test.svg"
     }
   },
   {

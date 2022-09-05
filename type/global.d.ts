@@ -70,6 +70,7 @@ declare global {
       robots?: Robots.Configuration
       page?: Page.Configuration
       sitemap?: Sitemap.Configuration
+      env?: { [s: string]: string }
     }
   }
 }

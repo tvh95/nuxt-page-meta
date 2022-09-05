@@ -57,7 +57,7 @@ Config Key `pageMeta`
 [
   {
     "meta": {
-      ["keywords"|"descriptions"]: <content in string>
+      [meta name]: <content in string>
     },
     "path": <exact path>,
     "match": <path regexp, in string>

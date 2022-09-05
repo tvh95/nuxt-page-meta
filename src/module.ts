@@ -31,7 +31,8 @@ const defaults: PageMeta.Configuration = {
   sitemap: {
     enable: true,
     imgJson: 'static-data/sitemap-image.json'
-  }
+  },
+  env: {}
 }
 
 function setup (options: PageMeta.Configuration, nuxt) {
@@ -58,7 +59,18 @@ function setup (options: PageMeta.Configuration, nuxt) {
   if (options.page.enable) {
     const metaJson = options.page.metaJson ? tryResolveModule(rootDirResolver.resolve(options.page.metaJson)) : null
     const metaData = metaJson ? require(metaJson) : []
-    global.metaData = metaData
+    global.metaData = metaData.map(({ meta, ...data }) => ({
+      meta: Object.keys(meta)
+        .map(name => ({
+          name,
+          content: meta[name]
+            .match(/{{[^}]*}}/gi)
+            ?.reduce((acc, cur) => {
+              return acc.replace(cur, options.env[cur.replace(/({{)|(}})/g, '')])
+            }, meta[name]) || meta[name]
+        })),
+      ...data
+    }))
     const runtimeDir = createResolver(import.meta.url).resolve('./runtime')
     nuxt.options.build.transpile.push(runtimeDir)
     addPlugin(createResolver(runtimeDir).resolve('page-meta'))
