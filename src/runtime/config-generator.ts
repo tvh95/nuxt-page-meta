@@ -17,6 +17,30 @@ import { recursiveGetFiles } from './tools'
 const relativeDir = process.argv[2] || ''
 const rootDir = resolve(process.cwd(), relativeDir)
 
+const meta = {
+  keywords: '',
+  description: '',
+  robots: '',
+  googlebot: '',
+  google: '',
+  viewport: '',
+  rating: ''
+}
+
+const openGraph = {
+  title: '',
+  type: '',
+  image: '',
+  url: ''
+}
+
+const httpEquiv = {
+  'content-security-policy': '',
+  'content-type': '',
+  'default-style': '',
+  'x-ua-compatible': ''
+}
+
 async function nuxtConfig () {
   const { config } = await loadConfig({
     name: 'nuxt',
@@ -51,7 +75,12 @@ async function nuxtConfig () {
       })
 
     const metaJsonNewData = pagesList
-      .map(data => ({ ...data, meta: {} }))
+      .map(data => ({
+        ...data,
+        meta,
+        openGraph,
+        httpEquiv
+      }))
     if (existsSync(metaJson)) {
       const metaJsonOldData = JSON.parse(readFileSync(metaJson, 'utf-8'))
       lodash.merge(metaJsonNewData, metaJsonOldData)

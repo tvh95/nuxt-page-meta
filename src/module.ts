@@ -57,20 +57,43 @@ function setup (options: PageMeta.Configuration, nuxt) {
   }
 
   if (options.page.enable) {
-    const metaJson = options.page.metaJson ? tryResolveModule(rootDirResolver.resolve(options.page.metaJson)) : null
+    const metaJson = options.page.metaJson
+      ? tryResolveModule(rootDirResolver.resolve(options.page.metaJson))
+      : null
     const metaData = metaJson ? require(metaJson) : []
-    global.metaData = metaData.map(({ meta, ...data }) => ({
-      meta: Object.keys(meta)
-        .map(name => ({
-          name,
-          content: meta[name]
-            .match(/{{[^}]*}}/gi)
-            ?.reduce((acc, cur) => {
-              return acc.replace(cur, options.env[cur.replace(/({{)|(}})/g, '')])
-            }, meta[name]) || meta[name]
-        })),
-      ...data
-    }))
+    global.metaData = metaData.map(({ meta, openGraph, httpEquiv, ...x }) => {
+      const metaArr = []
+      if (meta) {
+        for (const name in meta) {
+          metaArr.push({ hid: name, name, content: meta[name] })
+        }
+      }
+      if (openGraph) {
+        for (const i in openGraph) {
+          const property = 'og:' + i
+          metaArr.push({ hid: property, property, content: openGraph[i] })
+        }
+      }
+      if (httpEquiv) {
+        for (const i in httpEquiv) {
+          metaArr.push({ hid: 'he-' + i, 'http-equiv': i, content: httpEquiv[i] })
+        }
+      }
+      return {
+        meta: metaArr
+          .filter(({ content }) => content)
+          .map(({ content, ...data }) => ({
+            content: content?.match(/{{[^}]*}}/gi)
+              ?.reduce(
+                (acc, cur) => acc.replace(cur, options.env[cur.replace(/({{)|(}})/g, '')]),
+                content
+              ) || content,
+            ...data
+          })),
+        ...x
+      }
+    })
+    console.log(global.metaData)
     const runtimeDir = createResolver(import.meta.url).resolve('./runtime')
     nuxt.options.build.transpile.push(runtimeDir)
     addPlugin(createResolver(runtimeDir).resolve('page-meta'))

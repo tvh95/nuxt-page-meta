@@ -3,15 +3,35 @@
     "path": "/menu",
     "meta": {
       "keywords": "abcd",
-      "og:image": "{{DOMAIN}}/image/test.svg"
+      "description": "",
+      "robots": "",
+      "googlebot": "",
+      "google": "",
+      "viewport": "",
+      "rating": ""
+    },
+    "openGraph": {
+      "image": "/opengraph.png"
+    },
+    "httpEquiv": {
+      "content-type": "text/html; charset=utf-8"
     }
   },
   {
     "match": "^\\/item\\/[^/]*\\/?$",
-    "meta": {}
+    "meta": {},
+    "openGraph": {
+      "image": ""
+    },
+    "httpEquiv": {}
   },
   {
     "path": "/menu",
-    "meta": {}
+    "meta": {
+    },
+    "openGraph": {
+      "image": ""
+    },
+    "httpEquiv": {}
   }
 ]
